@@ -8,8 +8,8 @@
 
 cd `ak_t`, run:
 - `rails db:create`
-- `rails `db:migration`
-- `rails `db:seed`
+- `rails db:migrate`
+- `rails db:seed`
 
 To start the server, run `rails s`
 
@@ -53,8 +53,8 @@ Accepted params:
 * `fulfilment_type`(required): The fulfilment_type of the inventory
 * `serving_date_start`: serving date start of the inventory. For example `2022-01-30`
 * `serving_date_end`: serving end start of the inventory. For example `2022-02-30`
-* `timeslot_start`: Integer represents timeslot start value. For example `0` = `12:00AM`
-* `timeslot_end`: Integer represents timeslot end value. For example `82800` = `11:00PM`
+* `timeslot_start`: Integer represents timeslot start value. For example `12:00AM` = `0`
+* `timeslot_end`: Integer represents timeslot end value. For example `11:00PM` = `82800`
 
 **Timeslot Integer**
 '12:00AM' => 0,
@@ -84,9 +84,7 @@ Accepted params:
 
 ## Missing Features
 
-Due to time constriant and unclear requirements, some required features are still missing:
-
-* Point 3: When a modifier group with a minimum required has no available modifiers, the product should be marked as sold out.
+* When a modifier group with a minimum required has no available modifiers, the product should be marked as sold out.
 
 ## Implementation details
 - Please refer to [each commit for implementation details](https://github.com/somethvictory/ak_t/commits/main)
