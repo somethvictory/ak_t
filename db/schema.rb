@@ -13,17 +13,10 @@
 ActiveRecord::Schema.define(version: 2022_01_29_023544) do
 
   create_table "blocks", force: :cascade do |t|
-    t.integer "item_id"
-    t.integer "outlet_id", null: false
-    t.integer "modifier_id"
-    t.string "fulfilment_type", default: "Deliver", null: false
-    t.integer "timeslot_start", null: false
-    t.integer "timeslot_end", null: false
+    t.integer "inventory_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["item_id"], name: "index_blocks_on_item_id"
-    t.index ["modifier_id"], name: "index_blocks_on_modifier_id"
-    t.index ["outlet_id"], name: "index_blocks_on_outlet_id"
+    t.index ["inventory_id"], name: "index_blocks_on_inventory_id"
   end
 
   create_table "cart_items", force: :cascade do |t|
@@ -49,6 +42,10 @@ ActiveRecord::Schema.define(version: 2022_01_29_023544) do
     t.integer "outlet_id", null: false
     t.integer "item_id", null: false
     t.integer "modifier_id", null: false
+    t.datetime "serving_date_start", precision: 6
+    t.datetime "serving_date_end", precision: 6
+    t.integer "timeslot_start"
+    t.integer "timeslot_end"
     t.integer "quantity"
     t.string "fulfilment_type", default: "Delivery", null: false
     t.datetime "created_at", precision: 6, null: false
