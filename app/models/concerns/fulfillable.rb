@@ -2,6 +2,6 @@ module Fulfillable
   extend ActiveSupport::Concern
 
   def fulfilment_type_enum
-    { Deliver: 'Delivery', Pickup: 'Pickup' }
+    { Delivery: 'Delivery', Pickup: 'Pickup' }
   end
 end
