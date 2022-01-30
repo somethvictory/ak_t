@@ -15,9 +15,7 @@ To start the server, run `rails s`
 
 To run tests, run `rspec`
 ## Features
-The input of the data can be manage by the admin panel.
-
-Visit `localhost:3000/admin`
+The input of the data can be manage by the admin panel by visiting `localhost:3000/admin`
 
 ##### STOCK
 * **Blocks** For blocking the inventory
@@ -42,7 +40,7 @@ This sections store all the information related to the item and its related comp
 
 After running `rails db:seed`, there should be sample data for each of the item.
 
-## Usage
+## Stock Availability API
 
 After setting up the inventories and blocks. The item availability can be queried by calling:
 
