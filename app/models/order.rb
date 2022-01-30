@@ -9,8 +9,8 @@ class Order < ActiveRecord::Base
   validates :timeslot_start, presence: true
   validates :timeslot_end, presence: true
 
-  validate :item_availability
   validate :inventory_availability
+  validate :item_availability
 
   include Fulfillable
   include TimeAllocatable
@@ -18,16 +18,12 @@ class Order < ActiveRecord::Base
   accepts_nested_attributes_for :order_items, allow_destroy: true
 
   def item_availability
-    errors.add(:base, 'Item or Modifier is blocked') if Block.where("outlet_id = ?
-                                                                     AND (item_id IN (?) OR modifier_id IN (?))
-                                                                     AND fulfilment_type = ?
-                                                                     AND ((timeslot_start < ? AND timeslot_end > ?) OR  (timeslot_start < ? AND timeslot_end > ?))",
-                                                                     outlet_id,
-                                                                     order_items.map(&:item_id),
-                                                                     order_items.map(&:modifier_id),
-                                                                     fulfilment_type,
-                                                                     timeslot_start, timeslot_start,
-                                                                     timeslot_end, timeslot_end).any?
+    inventories = Inventory.where(outlet: outlet,
+                                  item: order_items.map(&:item_id),
+                                  modifier: order_items.map(&:modifier_id),
+                                  fulfilment_type: fulfilment_type)
+
+    errors.add(:base, 'Item or Modifier is blocked') if Block.exists?(inventory_id: inventories.ids)
   end
 
   def inventory_availability
