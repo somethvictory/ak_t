@@ -24,11 +24,10 @@ RSpec.describe Order, type: :model do
       let(:fulfilment_type) { 'Delivery' }
       let!(:inventory) { create(:inventory, outlet: outlet, item: item, modifier: modifier, fulfilment_type: fulfilment_type) }
       let!(:order_item) { create(:order_item, item: item, modifier: modifier) }
-      let!(:block) { create(:block, outlet: outlet, item: item, timeslot_start: Timeslot::HOURS['01:00AM'], timeslot_end: Timeslot::HOURS['07:00AM'], fulfilment_type: 'Delivery') }
 
       context 'when ordering comes from another outlet' do
         let(:outlet1) { create(:outlet) }
-        let(:order) { build(:order, outlet: outlet1, timeslot_start: Timeslot::HOURS['01:00AM'], timeslot_end: Timeslot::HOURS['02:00AM'], fulfilment_type: 'Delivery') }
+        let(:order) { build(:order, outlet: outlet1, fulfilment_type: 'Delivery') }
 
         it 'allows the order to be created' do
           expect(order.save).to eq(true)
@@ -36,7 +35,7 @@ RSpec.describe Order, type: :model do
       end
 
       context 'when ordering comes from another item' do
-        let(:order) { build(:order, outlet: outlet, timeslot_start: Timeslot::HOURS['02:00AM'], timeslot_end: Timeslot::HOURS['03:00AM'], fulfilment_type: 'Delivery') }
+        let(:order) { build(:order, outlet: outlet, fulfilment_type: 'Delivery') }
         let(:order_item1) { create(:order_item) }
         let!(:inventory) { create(:inventory, outlet: outlet, item: order_item1.item, modifier: order_item1.modifier, fulfilment_type: fulfilment_type) }
 
@@ -49,65 +48,17 @@ RSpec.describe Order, type: :model do
         end
       end
 
-      context 'when ordering is out of blocked ranges' do
-        let(:order) { build(:order, outlet: outlet, timeslot_start: Timeslot::HOURS['08:00AM'], timeslot_end: Timeslot::HOURS['09:00AM'], fulfilment_type: 'Delivery') }
-
-        it 'allows the order to be created' do
-          expect(order.save).to eq(true)
-        end
-      end
-
       context 'when ordering fulfilment_type is different' do
-        let(:order) { build(:order, outlet: outlet, timeslot_start: Timeslot::HOURS['01:00AM'], timeslot_end: Timeslot::HOURS['02:00AM'], fulfilment_type: 'Pickup') }
+        let(:order) { build(:order, outlet: outlet, fulfilment_type: 'Pickup') }
 
         it 'allows the order to be created' do
           expect(order.save).to eq(true)
         end
       end
 
-      context 'when order timeslot_start is within the blocked ranges' do
-        let(:order) { build(:order, outlet: outlet, timeslot_start: Timeslot::HOURS['02:00AM'], timeslot_end: Timeslot::HOURS['10:00AM'], fulfilment_type: 'Delivery') }
-
-        before do
-          order.order_items = [order_item]
-        end
-
-        it 'does not allow the order to be created' do
-          expect(order.save).to eq(false)
-          expect(order.errors[:base]).to eq(['Item or Modifier is blocked'])
-        end
-      end
-
-      context 'when order timeslot_end is within the blocked ranges' do
-        let(:order) { build(:order, outlet: outlet, timeslot_start: Timeslot::HOURS['01:00AM'], timeslot_end: Timeslot::HOURS['03:00AM'], fulfilment_type: 'Delivery') }
-
-        before do
-          order.order_items = [order_item]
-        end
-
-        it 'does not allow the order to be created' do
-          expect(order.save).to eq(false)
-          expect(order.errors[:base]).to eq(['Item or Modifier is blocked'])
-        end
-      end
-
-      context 'when the item is blocked within a time range' do
-        let!(:block) { create(:block, outlet: outlet, item: item, timeslot_start: Timeslot::HOURS['12:00AM'], timeslot_end: Timeslot::HOURS['07:00AM'], fulfilment_type: 'Delivery') }
-        let(:order) { build(:order, outlet: outlet, timeslot_start: Timeslot::HOURS['01:00AM'], timeslot_end: Timeslot::HOURS['02:00AM'], fulfilment_type: 'Delivery') }
-
-        before do
-          order.order_items = [order_item]
-        end
-
-        it 'does not allow the order to be created' do
-          expect(order.save).to eq(false)
-          expect(order.errors[:base]).to eq(['Item or Modifier is blocked'])
-        end
-      end
-
-      context 'when the modifier is blocked within a time range' do
-        let!(:block) { create(:block, outlet: outlet, modifier: modifier, timeslot_start: Timeslot::HOURS['12:00AM'], timeslot_end: Timeslot::HOURS['07:00AM'], fulfilment_type: 'Delivery') }
-        let(:order) { build(:order, outlet: outlet, timeslot_start: Timeslot::HOURS['01:00AM'], timeslot_end: Timeslot::HOURS['02:00AM'], fulfilment_type: 'Delivery') }
+      context 'inventory is block' do
+        let!(:block) { create(:block, inventory: inventory) }
+        let(:order) { build(:order, outlet: outlet, fulfilment_type: 'Delivery') }
 
         before do
           order.order_items = [order_item]
